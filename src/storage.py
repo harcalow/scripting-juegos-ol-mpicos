@@ -12,6 +12,7 @@ def create_table():
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS Medal_table (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Rank INTEGER NOT NULL,
                     Country TEXT NOT NULL,
                     Gold INTEGER NOT NULL,
                     Silver INTEGER NOT NULL,
@@ -24,17 +25,20 @@ def create_table():
 
 
 
-def insert_value(country, gold, silver, bronze, total):
-    if not isinstance(country, str) or not isinstance(gold, int) or not isinstance(silver, int) or not isinstance(bronze, int) or not isinstance(total, int):
+def insert_value(rank, country, gold, silver, bronze, total):
+    if not isinstance(rank, int) or not isinstance(country, str) or not isinstance(gold, int) or not isinstance(silver, int) or not isinstance(bronze, int) or not isinstance(total, int):
         raise ValueError("Datos inválidos: asegúrate de que country sea un string y las medallas sean enteros.")
     
-    with sqlite3.connect(db_path()) as conn:
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO Medal_table (Country, Gold, Silver, Bronze, Total) 
-            VALUES (?, ?, ?, ?, ?)
-        ''', (country, gold, silver, bronze, total))
-        print("Datos guardados exitosamente.")
-        conn.commit()
+    try:
+        with sqlite3.connect(db_path()) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO Medal_table (Rank, Country, Gold, Silver, Bronze, Total) 
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (rank, country, gold, silver, bronze, total))
+            print("Datos guardados exitosamente.")
+            conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error al insertar valores: {e}")
 
 
