@@ -9,6 +9,7 @@ def db_path():
 def create_table():
     create_table_medal_table()
     create_medal_table_by_sport()
+    create_medal_medals_per_event()
 
 def create_table_medal_table():
     try:
@@ -56,8 +57,9 @@ def create_medal_medals_per_event():
                     Country TEXT NOT NULL,
                     Sport TEXT NOT NULL, 
                     Sport_test TEXT NOT NULL,
-                    Sportsman TEXT NOT NULL,   
+                    Sportsman TEXT NOT NULL, 
                     Medal INTEGER NOT NULL,
+                    Link TEXT,   
                     FOREIGN KEY (Country) REFERENCES Medal_table(Country),
                     FOREIGN KEY (Sport) REFERENCES Medal_table_by_sport(Sport)       
                 )
@@ -78,13 +80,12 @@ def insert_value(rank, country, gold, silver, bronze, total):
                 INSERT INTO Medal_table (Rank, Country, Gold, Silver, Bronze, Total) 
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (rank, country, gold, silver, bronze, total))
-            print("Datos guardados exitosamente.")
             conn.commit()
     except sqlite3.Error as e:
         print(f"Error al insertar valores: {e}")
 
 
-def insert_value_data_sports(country,sport, gold, silver, bronze, total):
+def insert_value_data_per_event(country,sport, gold, silver, bronze, total):
     if not isinstance(country, str) or not isinstance(sport, str) or not isinstance(gold, int) or not isinstance(silver, int) or not isinstance(bronze, int) or not isinstance(total, int):
         raise ValueError("Datos inválidos: asegúrate de que country sea un string y las medallas sean enteros.")
     try:
@@ -94,9 +95,21 @@ def insert_value_data_sports(country,sport, gold, silver, bronze, total):
                 INSERT INTO Medal_table_by_sport (Country,Sport ,Gold, Silver, Bronze, Total) 
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', (country,sport,gold, silver, bronze, total))
-            print("Datos guardados exitosamente.")
             conn.commit()
     except sqlite3.Error as e:
         print(f"Error al insertar valores: {e}")
 
 
+def insert_value_data_sports(country,sport,sport_test,sportsman, medal, link='null'):
+    if not isinstance(country, str) or not isinstance(sport, str) or not isinstance(sport_test, str) or not isinstance(sportsman, str) or not isinstance(medal, str):
+        raise ValueError("Datos inválidos")
+    try:
+        with sqlite3.connect(db_path()) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO Medal_per_event (Country,Sport ,Sport_test, Sportsman, Medal, Link) 
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (country,sport,sport_test, sportsman, medal, link))
+            conn.commit()
+    except sqlite3.Error as e:
+        print(f"Error al insertar valores: {e}")
